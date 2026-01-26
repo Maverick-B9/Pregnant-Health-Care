@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MaaSakhi - Caring for You{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <!-- Global Decorative Background -->
+    <div class="deco-blob blob-1"></div>
+    <div class="deco-blob blob-2"></div>
+    <div class="deco-blob blob-3"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="loader-logo" alt="Loading...">
+    </div>
+
+    <header class="app-header page-transition">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="MaaSakhi Logo"
+                style="height: 50px; width: auto;">
+        </div>
+        <nav>
+            <ul class="nav-links">
+                {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('main.dashboard') }}" onclick="showLoader()"
+                        class="{{ 'active' if request.endpoint == 'main.dashboard' }}">Dashboard</a></li>
+                <li><a href="{{ url_for('main.pregnancy_guide') }}" onclick="showLoader()"
+                        class="{{ 'active' if request.endpoint == 'main.pregnancy_guide' }}">Pregnancy Guide</a></li>
+                <li><a href="{{ url_for('main.diagnostics') }}" onclick="showLoader()"
+                        class="{{ 'active' if request.endpoint == 'main.diagnostics' }}">Diagnostics</a></li>
+                <li><a href="{{ url_for('main.chatbot_page') }}" onclick="showLoader()"
+                        class="{{ 'active' if request.endpoint == 'main.chatbot_page' }}">MaaSakhi Assistant</a></li>
+                <li><a href="{{ url_for('main.emergency') }}" onclick="showLoader()"
+                        class="{{ 'active' if request.endpoint == 'main.emergency' }} text-danger font-weight-bold">Emergency</a>
+                </li>
+                <li><a href="{{ url_for('auth.logout') }}" onclick="showLoader()">Logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}" onclick="showLoader()">Login</a></li>
+                <li><a href="{{ url_for('auth.register') }}" onclick="showLoader()">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <div class="flash-messages page-transition">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="main-wrapper page-transition">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="page-transition">
+        <p>&copy; {{ current_year }} MaaSakhi. Developed By <strong>Balaram B</strong> ❤️</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+
+    <script>
+        function showLoader() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.remove('hidden');
+            overlay.style.display = 'flex';
+        }
+
+        function hideLoader() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.add('hidden');
+            setTimeout(() => {
+                if (overlay.classList.contains('hidden')) {
+                    overlay.style.display = 'none';
+                }
+            }, 1200);
+        }
+
+        // Hide loader when page is fully loaded (fixes back button issues)
+        window.addEventListener('pageshow', function () {
+            hideLoader();
+        });
+
+        // Attach listener to all forms
+        document.addEventListener('submit', function () {
+            showLoader();
+        });
+    </script>
+</body>
+
+</html>

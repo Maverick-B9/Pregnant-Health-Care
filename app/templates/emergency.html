@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Emergency Help - MaaSakhi{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1000px; margin: 0 auto; padding-bottom: 50px;">
+
+    <!-- Title Section -->
+    <div class="text-center mb-5 fade-up">
+        <h1 class="display-4" style="color: var(--accent-color); margin-bottom: 10px;">
+            <i class="fas fa-heartbeat"></i> Emergency Help
+        </h1>
+        <p class="lead" style="color: var(--text-secondary);">We are here to help you finding the nearest assistance.
+        </p>
+    </div>
+
+    <!-- Location Setter Card -->
+    <div class="glass-card mb-5 p-4 fade-up" style="animation-delay: 0.2s;">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h4 style="color: var(--primary-color); margin-bottom: 5px;">
+                    <i class="fas fa-map-marker-alt"></i> Set Your Location
+                </h4>
+                <p class="small text-muted mb-3 mb-md-0">Enter your city or area to find services near you.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type="text" id="userLocation" class="form-control" placeholder="e.g. Mumbai, Bandra..."
+                        style="border-radius: 50px 0 0 50px; border-right: none;">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button" onclick="saveLocation()"
+                            style="border-radius: 0 50px 50px 0;">Save</button>
+                    </div>
+                </div>
+                <small id="locationStatus" class="text-success font-weight-bold mt-2"
+                    style="display:none; display: block; text-align: right;">
+                    <!-- JS will pop this -->
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Action Cards -->
+    <div class="row">
+        <!-- Hospital Card -->
+        <div class="col-md-4 mb-4 fade-up" style="animation-delay: 0.3s;">
+            <div class="card h-100 text-center p-4">
+                <div class="mb-3">
+                    <i class="fas fa-hospital-alt fa-4x" style="color: var(--primary-color);"></i>
+                </div>
+                <h3 class="mb-3">Hospitals</h3>
+                <p class="text-muted mb-4">Find trusted maternity hospitals and clinics nearby.</p>
+                <button onclick="searchNearby('hospitals')" class="btn btn-primary btn-block w-100">Find
+                    Hospitals</button>
+            </div>
+        </div>
+
+        <!-- Pharmacy Card -->
+        <div class="col-md-4 mb-4 fade-up" style="animation-delay: 0.4s;">
+            <div class="card h-100 text-center p-4">
+                <div class="mb-3">
+                    <i class="fas fa-capsules fa-4x" style="color: var(--warning-color);"></i>
+                </div>
+                <h3 class="mb-3">Pharmacies</h3>
+                <p class="text-muted mb-4">Locate open medical stores and pharmacies.</p>
+                <button onclick="searchNearby('pharmacies')" class="btn btn-outline-warning btn-block w-100"
+                    style="border: 2px solid var(--warning-color); color: inherit; border-radius: 50px; padding: 10px; font-weight:600;">Find
+                    Pharmacies</button>
+            </div>
+        </div>
+
+        <!-- Ambulance Card -->
+        <div class="col-md-4 mb-4 fade-up" style="animation-delay: 0.5s;">
+            <div class="card h-100 text-center p-4" style="border-color: rgba(220, 53, 69, 0.3);">
+                <div class="mb-3">
+                    <i class="fas fa-ambulance fa-4x text-danger"></i>
+                </div>
+                <h3 class="mb-3 text-danger">Ambulance</h3>
+                <p class="text-muted mb-4">Immediate emergency assistance.</p>
+                <a href="tel:102" class="btn btn-danger btn-block w-100 shadow-sm">
+                    <i class="fas fa-phone-alt mr-2"></i> Call 102
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const savedLocation = localStorage.getItem('user_emergency_location');
+        if (savedLocation) {
+            document.getElementById('userLocation').value = savedLocation;
+        }
+    });
+
+    function saveLocation() {
+        const locationInput = document.getElementById('userLocation');
+        const location = locationInput.value.trim();
+        const status = document.getElementById('locationStatus');
+
+        if (location) {
+            localStorage.setItem('user_emergency_location', location);
+            status.innerHTML = '<i class="fas fa-check-circle"></i> Location Saved!';
+            status.style.color = 'var(--success-color)';
+            status.style.display = 'block';
+
+            // Animation for feedback
+            locationInput.style.borderColor = 'var(--success-color)';
+            setTimeout(() => {
+                status.style.display = 'none';
+                locationInput.style.borderColor = '';
+            }, 3000);
+        } else {
+            status.innerHTML = 'Please enter a location.';
+            status.style.color = 'var(--danger-color)';
+            status.style.display = 'block';
+            locationInput.focus();
+        }
+    }
+
+    function searchNearby(serviceType) {
+        const location = localStorage.getItem('user_emergency_location');
+
+        if (!location) {
+            const userResponse = confirm("Please set your location first to find nearby services.");
+            if (userResponse) {
+                document.getElementById('userLocation').focus();
+            }
+            return;
+        }
+
+        let query = "";
+        if (serviceType === 'hospitals') {
+            query = `Maternity hospitals near ${location}`;
+        } else if (serviceType === 'pharmacies') {
+            query = `Pharmacies near ${location}`;
+        }
+
+        if (query) {
+            const url = `https://www.google.com/maps/search/${encodeURIComponent(query)}`;
+            // Open in new tab with a nice transition feeling (though basic JS limit)
+            window.open(url, '_blank');
+        }
+    }
+</script>
+
+<style>
+    /* Page specific overrides if needed */
+    .fade-up {
+        opacity: 0;
+        animation: fadeUp 0.8s forwards;
+    }
+
+    @keyframes fadeUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+    }
+
+    /* Ensure inputs match the theme perfectly */
+    #userLocation::placeholder {
+        color: #adb5bd;
+    }
+</style>
+{% endblock %}

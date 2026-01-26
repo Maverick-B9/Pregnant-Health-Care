@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}Diagnostics - Future Health{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;" class="fade-up">
+    <!-- Tab Navigation -->
+    <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px;">
+        <button onclick="switchTab('prediction')" id="tab-prediction" class="btn-secondary"
+            style="background: rgba(0, 255, 163, 0.2); border: 1px solid var(--primary-accent);">
+            AI Early Prediction
+        </button>
+        <button onclick="switchTab('records')" id="tab-records" class="btn-secondary"
+            style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--primary-accent);">
+            Health Records
+        </button>
+    </div>
+
+    <!-- AI Prediction Form -->
+    <div id="view-prediction" class="glass-card" style="padding: 40px; display: block;">
+        <h2 style="text-align: center; margin-bottom: 30px;">
+            <i class="fas fa-microscope" style="color: var(--primary-accent); margin-right: 10px;"></i>
+            Diabetes Risk Analysis
+        </h2>
+
+        <form method="POST" action="{{ url_for('main.diagnostics') }}">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label style="display: block; color: var(--text-secondary); margin-bottom: 5px;">Pregnancies</label>
+                    <input type="number" step="any" name="pregnancies" class="form-control" placeholder="Count"
+                        value="{{ inputs.pregnancies or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; color: var(--text-secondary); margin-bottom: 5px;">Glucose
+                        (mg/dL)</label>
+                    <input type="number" step="any" name="glucose" class="form-control" placeholder="Level"
+                        value="{{ inputs.glucose or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; color: var(--text-secondary); margin-bottom: 5px;">Blood Pressure (mm
+                        Hg)</label>
+                    <input type="number" step="any" name="bloodpressure" class="form-control" placeholder="Level"
+                        value="{{ inputs.bloodpressure or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; color: var(--text-secondary); margin-bottom: 5px;">Skin Thickness
+                        (mm)</label>
+                    <input type="number" step="any" name="skinthickness" class="form-control" placeholder="Thickness"
+                        value="{{ inputs.skinthickness or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; color: var(--text-secondary); margin-bottom: 5px;">Insulin (mu
+                        U/ml)</label>
+                    <input type="number" step="any" name="insulin" class="form-control" placeholder="Level"
+                        value="{{ inputs.insulin or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; color: var(--text-secondary); margin-bottom: 5px;">BMI (kg/m²)</label>
+                    <input type="number" step="any" name="bmi" class="form-control" placeholder="Index"
+                        value="{{ inputs.bmi or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; color: var(--text-secondary); margin-bottom: 5px;">Diabetes
+                        Pedigree</label>
+                    <input type="number" step="any" name="dpf" class="form-control" placeholder="Function"
+                        value="{{ inputs.dpf or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; color: var(--text-secondary); margin-bottom: 5px;">Age</label>
+                    <input type="number" step="any" name="age" class="form-control" placeholder="Years"
+                        value="{{ inputs.age or '' }}" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
+                Run Analysis Sequence
+            </button>
+        </form>
+
+        {% if prediction_value is not none %}
+        <div
+            style="margin-top: 30px; padding: 20px; border-radius: 12px; background: rgba(0, 255, 163, 0.1); border: 1px solid var(--success-color); text-align: center;">
+            <h3 style="color: var(--success-color);">Analysis Complete</h3>
+            <p style="font-size: 1.2rem; margin-top: 10px;">
+                Estimated Risk Factor: <strong style="font-size: 1.5rem;">{{ prediction_value }}%</strong>
+            </p>
+        </div>
+        {% elif prediction_text %}
+        <div
+            style="margin-top: 30px; padding: 20px; border-radius: 12px; background: rgba(255, 42, 109, 0.1); border: 1px solid var(--danger-color); text-align: center;">
+            <h3 style="color: var(--danger-color);">Analysis Failed</h3>
+            <p>{{ prediction_text }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Health Records View -->
+    <div id="view-records" class="glass-card" style="padding: 40px; display: none;">
+        <h2 style="text-align: center; margin-bottom: 30px;">
+            <i class="fas fa-file-medical-alt" style="color: var(--primary-accent); margin-right: 10px;"></i>
+            My Health Records
+        </h2>
+
+        <div class="records-container">
+            {% for category, tests in categories.items() %}
+            <div class="record-category"
+                style="margin-bottom: 30px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="color: var(--primary-accent); margin: 0;">{{ category }}</h3>
+                </div>
+
+                <!-- Existing Records List -->
+                {% if user_records.get(category) %}
+                <div class="existing-records" style="margin-bottom: 15px;">
+                    <table
+                        style="width: 100%; color: var(--text-secondary); font-size: 0.9rem; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <th style="text-align: left; padding: 8px;">Test</th>
+                                <th style="text-align: left; padding: 8px;">Value/Result</th>
+                                <th style="text-align: left; padding: 8px;">Date</th>
+                                <th style="text-align: right; padding: 8px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in user_records[category] %}
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 8px;">{{ record.test_name }}</td>
+                                <td style="padding: 8px;">
+                                    {% if record.value_numeric %}{{ record.value_numeric }}{% endif %}
+                                    {% if record.value_text %}{{ record.value_text }}{% endif %}
+                                </td>
+                                <td style="padding: 8px;">{{ record.test_date }}</td>
+                                <td style="padding: 8px; text-align: right;">
+                                    {% if record.file_path %}
+                                    <a href="{{ url_for('static', filename=record.file_path) }}" target="_blank"
+                                        style="color: var(--primary-accent); text-decoration: none;">
+                                        <i class="fas fa-paperclip"></i> View
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+
+                <!-- Add New Record Action -->
+                <div style="text-align: right;">
+                    <button onclick="openRecordModal('{{ category }}')" class="btn-sm"
+                        style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--text-secondary); color: var(--text-primary); padding: 5px 15px; border-radius: 20px; cursor: pointer;">
+                        <i class="fas fa-plus"></i> Add Record
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Record Modal -->
+<div id="recordModal" class="modal"
+    style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(255,255,255,0.4); backdrop-filter: blur(8px);">
+    <div class="modal-content glass-card fade-up"
+        style="margin: 5% auto; padding: 40px; background: #fff; border: 2px solid var(--primary-soft); border-radius: 20px; width: 90%; max-width: 500px; position: relative; box-shadow: 0 20px 50px rgba(255, 182, 193, 0.4);">
+
+        <span onclick="closeRecordModal()" class="close"
+            style="color: var(--text-secondary); position: absolute; right: 25px; top: 20px; font-size: 30px; font-weight: bold; cursor: pointer; transition: 0.3s;">&times;</span>
+
+        <div style="text-align: center; margin-bottom: 25px;">
+            <i class="fas fa-file-medical"
+                style="font-size: 3rem; color: var(--primary-color); margin-bottom: 10px;"></i>
+            <h3 id="modalTitle" style="color: var(--text-primary); font-family: var(--font-heading);">Add Health Record
+            </h3>
+        </div>
+
+        <form method="POST" action="{{ url_for('main.diagnostics') }}" enctype="multipart/form-data">
+            <input type="hidden" name="category" id="modalCategory">
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">Test
+                    Name</label>
+                <div style="position: relative;">
+                    <select name="test_name" id="modalTestName" class="form-control"
+                        style="width: 100%; padding: 12px; background: #fdfdfd; border: 2px solid var(--primary-soft); color: var(--text-primary); border-radius: 12px; appearance: none; cursor: pointer;"
+                        required>
+                        <!-- Populated by JS -->
+                    </select>
+                    <i class="fas fa-chevron-down"
+                        style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--primary-color); pointer-events: none;"></i>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label
+                    style="display: block; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">Numeric
+                    Value <span style="font-weight: 400; font-size: 0.85rem;">(Optional)</span></label>
+                <input type="number" step="any" name="value_numeric" class="form-control" placeholder="e.g. 12.5"
+                    style="width: 100%; padding: 12px; background: #fdfdfd; border: 2px solid var(--primary-soft); color: var(--text-primary); border-radius: 12px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">Text
+                    Observation <span style="font-weight: 400; font-size: 0.85rem;">(Optional)</span></label>
+                <input type="text" name="value_text" class="form-control" placeholder="e.g. Normal, B Positive"
+                    style="width: 100%; padding: 12px; background: #fdfdfd; border: 2px solid var(--primary-soft); color: var(--text-primary); border-radius: 12px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label
+                    style="display: block; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">Date</label>
+                <input type="date" name="test_date" required class="form-control"
+                    style="width: 100%; padding: 12px; background: #fdfdfd; border: 2px solid var(--primary-soft); color: var(--text-primary); border-radius: 12px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label
+                    style="display: block; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">Upload
+                    Report <span style="font-weight: 400; font-size: 0.85rem;">(PDF/Img)</span></label>
+                <div style="position: relative; overflow: hidden; display: inline-block; width: 100%;">
+                    <input type="file" name="report_file" class="form-control"
+                        style="width: 100%; padding: 10px; background: #fff0f5; border: 2px dashed var(--primary-color); color: var(--text-primary); border-radius: 12px; cursor: pointer;">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label
+                    style="display: block; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">Notes</label>
+                <textarea name="notes" class="form-control" rows="2" placeholder="Add any doctor's comments..."
+                    style="width: 100%; padding: 12px; background: #fdfdfd; border: 2px solid var(--primary-soft); color: var(--text-primary); border-radius: 12px; resize: none;"></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary"
+                style="width: 100%; padding: 15px; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);">
+                <i class="fas fa-save" style="margin-right: 8px;"></i> Save Record
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Pass python dict to JS
+    const categoriesData = {{ categories | tojson }};
+
+    function switchTab(tab) {
+        document.getElementById('view-prediction').style.display = tab === 'prediction' ? 'block' : 'none';
+        document.getElementById('view-records').style.display = tab === 'records' ? 'block' : 'none';
+
+        document.getElementById('tab-prediction').style.background = tab === 'prediction' ? 'rgba(0, 255, 163, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+        document.getElementById('tab-records').style.background = tab === 'records' ? 'rgba(0, 255, 163, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+    }
+
+    function openRecordModal(category) {
+        document.getElementById('recordModal').style.display = 'block';
+        document.getElementById('modalCategory').value = category;
+        document.getElementById('modalTitle').innerText = 'Add Record - ' + category;
+
+        // Populate test names dropdown
+        const select = document.getElementById('modalTestName');
+        select.innerHTML = '';
+        const tests = categoriesData[category];
+        tests.forEach(test => {
+            const option = document.createElement('option');
+            option.value = test;
+            option.style.color = 'black'; // Fix for some browsers showing white text on white
+            option.text = test;
+            select.appendChild(option);
+        });
+    }
+
+    function closeRecordModal() {
+        document.getElementById('recordModal').style.display = 'none';
+    }
+
+    // Close modal if clicked outside
+    window.onclick = function (event) {
+        const modal = document.getElementById('recordModal');
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+{% endblock %}

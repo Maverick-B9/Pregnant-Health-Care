@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Future Health{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid fade-up">
+    <!-- Welcome Header -->
+    <div style="grid-column: 1 / -1; margin-bottom: 5px;">
+        <h2 style="font-size: 2.5rem; margin-bottom: 5px; animation: slideUp 0.5s ease-out;">
+            Namaste, <span style="color: var(--primary-accent);">{{ current_user.name }}</span>! 🙏
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 1.1rem;">
+            Welcome to your sacred journey of motherhood.
+        </p>
+    </div>
+
+    <!-- Hero Section: Thought & Visuals -->
+    <div
+        style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; align-items: center; margin-bottom: 20px;">
+
+        <!-- Thought of the Day Widget -->
+        <div class="thought-widget fade-up"
+            style="height: 100%; min-height: 250px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <h4 style="color: var(--primary-color); margin-bottom: 20px; font-weight: 700; font-size: 1.4rem;">🌸
+                Thought for You</h4>
+            <div style="flex-grow: 1; display: flex; align-items: center;">
+                <p
+                    style="font-size: 1.3rem; font-style: italic; color: var(--text-primary); line-height: 1.6; font-family: 'Quicksand', serif;">
+                    "Your body is performing a miracle every single moment. Trust it, love it."
+                </p>
+            </div>
+        </div>
+
+        <!-- Visual Hero Card -->
+        <div class="vital-card fade-up"
+            style="height: 100%; background: linear-gradient(145deg, #ffffff, #fff0f5); border: none; box-shadow: 0 15px 40px rgba(255, 105, 180, 0.2); display: flex; align-items: center;">
+            <div class="vital-image" style="flex: 0 0 150px; padding: 15px;">
+                <img src="{{ url_for('static', filename='fetus.png') }}" alt="Baby in Womb"
+                    style="width: 100%; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); animation: float 6s infinite ease-in-out;">
+            </div>
+            <div class="vital-content" style="padding: 20px;">
+                <h3 style="color: var(--accent-color); margin-bottom: 10px; font-size: 1.3rem;">The Miracle Within</h3>
+                <p style="margin-bottom: 10px; font-size: 0.95rem; color: var(--text-secondary);">
+                    Every beat of your heart feeds a new life. Stay hydrated, eat well, and embrace this beautiful
+                    journey.
+                </p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <span class="badge"
+                        style="background: white; color: var(--primary-color); padding: 5px 12px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">❤️
+                        Heartbeat: Precious</span>
+                    <span class="badge"
+                        style="background: white; color: var(--primary-color); padding: 5px 12px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">✨
+                        Glow: Radiant</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tracker Form -->
+    <div class="glass-card" style="grid-column: 1 / -1; padding: 25px;">
+        <h3 style="margin-bottom: 20px;">Daily Tracker</h3>
+        <form method="POST" action="{{ url_for('main.dashboard') }}">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+
+                <!-- Sleep Slider -->
+                <div class="form-group">
+                    <label style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span><i class="fas fa-bed"></i> Sleep</span>
+                        <span id="sleep-val" style="color: var(--primary-accent); font-weight: bold;">{{
+                            health_stats.sleep_last_night_hours }}h</span>
+                    </label>
+                    <input type="range" name="sleep" min="0" max="12" step="0.5"
+                        value="{{ health_stats.sleep_last_night_hours }}" class="slider"
+                        oninput="document.getElementById('sleep-val').innerText = this.value + 'h'">
+                </div>
+
+                <!-- Steps Slider -->
+                <div class="form-group">
+                    <label style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span><i class="fas fa-person-walking"></i> Steps</span>
+                        <span id="steps-val" style="color: var(--success-color); font-weight: bold;">{{
+                            health_stats.steps_today }}</span>
+                    </label>
+                    <input type="range" name="steps" min="0" max="15000" step="100"
+                        value="{{ health_stats.steps_today }}" class="slider"
+                        oninput="document.getElementById('steps-val').innerText = this.value">
+                </div>
+
+                <!-- Water Slider -->
+                <div class="form-group">
+                    <label style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span><i class="fas fa-glass-water"></i> Water</span>
+                        <span id="water-val" style="color: var(--primary-accent); font-weight: bold;">{{
+                            health_stats.water_glasses }} glasses</span>
+                    </label>
+                    <input type="range" name="water" min="0" max="15" step="1" value="{{ health_stats.water_glasses }}"
+                        class="slider"
+                        oninput="document.getElementById('water-val').innerText = this.value + ' glasses'">
+                </div>
+            </div>
+
+            <div style="margin-top: 25px; text-align: right;">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save" style="margin-right: 8px;"></i> Save & Analyze
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Gemini Insight Section (Cards) -->
+    <!-- MaaSakhi Insight Section (Cards) -->
+    <div style="grid-column: 1 / -1; margin-top: 15px;">
+        <h3
+            style="margin-bottom: 25px; color: var(--secondary-accent); display: flex; align-items: center; font-size: 1.4rem;">
+            <i class="fas fa-magic" style="margin-right: 12px; color: var(--primary-color);"></i> MaaSakhi Insights
+        </h3>
+
+        {% if not health_stats.insight %}
+        <!-- Empty State -->
+        <div class="glass-card fade-up"
+            style="padding: 40px; text-align: center; border: 2px dashed rgba(255, 105, 180, 0.3);">
+            <i class="fas fa-robot" style="font-size: 3rem; color: var(--primary-soft); margin-bottom: 15px;"></i>
+            <h4 style="color: var(--text-secondary);">No Insights Yet</h4>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                Fill in your daily tracker above and click "Save & Analyze" to get personalized health tips!
+            </p>
+        </div>
+        {% elif health_stats.insight.legacy_full_text %}
+        <!-- Legacy Data View -->
+        <div class="glass-card fade-up" style="padding: 30px; border-left: 4px solid var(--secondary-accent);">
+            <h4 style="color: var(--secondary-accent); margin-bottom: 15px;">Daily Report</h4>
+            <div style="color: var(--text-primary); line-height: 1.7; font-size: 1rem;">
+                {{ health_stats.insight.legacy_full_text|markdown|safe }}
+            </div>
+        </div>
+        {% else %}
+        <!-- Premium Card Layout -->
+        <div class="insight-grid"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+
+            <!-- Quick Assessment -->
+            <div class="glass-card stat-card" style="border-left: 5px solid var(--primary-accent);">
+                <h5 style="color: var(--primary-accent); margin-bottom: 10px;">
+                    <i class="fas fa-bolt"></i> Quick Assessment
+                </h5>
+                <p style="color: var(--text-primary); font-size: 0.95rem;">
+                    {{ health_stats.insight.quick_assessment }}
+                </p>
+            </div>
+
+            <!-- Motivation -->
+            <div class="glass-card stat-card" style="border-left: 5px solid var(--success-color);">
+                <h5 style="color: var(--success-color); margin-bottom: 10px;">
+                    <i class="fas fa-heart"></i> Motivation
+                </h5>
+                <p style="color: var(--text-primary); font-size: 0.95rem;">
+                    {{ health_stats.insight.motivation }}
+                </p>
+            </div>
+
+            <!-- Sleep Analysis -->
+            <div class="glass-card stat-card" style="border-left: 5px solid #9b59b6;">
+                <h5 style="color: #9b59b6; margin-bottom: 10px;">
+                    <i class="fas fa-moon"></i> Sleep
+                </h5>
+                <div style="font-size: 0.9rem;">
+                    {{ health_stats.insight.analysis_sleep|markdown|safe }}
+                </div>
+            </div>
+
+            <!-- Activity Analysis -->
+            <div class="glass-card stat-card" style="border-left: 5px solid #1abc9c;">
+                <h5 style="color: #1abc9c; margin-bottom: 10px;">
+                    <i class="fas fa-walking"></i> Activity
+                </h5>
+                <div style="font-size: 0.9rem;">
+                    {{ health_stats.insight.analysis_steps|markdown|safe }}
+                </div>
+            </div>
+
+            <!-- Water Analysis -->
+            <div class="glass-card stat-card" style="border-left: 5px solid #3498db;">
+                <h5 style="color: #3498db; margin-bottom: 10px;">
+                    <i class="fas fa-tint"></i> Hydration
+                </h5>
+                <div style="font-size: 0.9rem;">
+                    {{ health_stats.insight.analysis_water|markdown|safe }}
+                </div>
+            </div>
+
+            <!-- Actionable Advice -->
+            <div class="glass-card stat-card"
+                style="grid-column: 1 / -1; background: #fff0f5; border: 1px solid var(--primary-soft);">
+                <h5 style="color: var(--accent-color); margin-bottom: 15px;">
+                    <i class="fas fa-lightbulb"></i> Actionable Advice
+                </h5>
+                <div style="color: var(--text-primary); font-size: 0.95rem;">
+                    {{ health_stats.insight.actionable_advice|markdown|safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="grid-column: 1 / -1; margin-top: 30px;">
+        <h3 style="margin-bottom: 20px;">Quick Access</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <a href="{{ url_for('main.diagnostics') }}" class="glass-card stat-card"
+                style="text-decoration: none; padding: 25px; text-align: center; display: block; color: var(--text-primary);">
+                <i class="fas fa-stethoscope fa-2x" style="color: var(--primary-color); margin-bottom: 10px;"></i>
+                <h5 style="margin: 0;">Check Vitals</h5>
+            </a>
+            <a href="{{ url_for('main.chatbot_page') }}" class="glass-card stat-card"
+                style="text-decoration: none; padding: 25px; text-align: center; display: block; color: var(--text-primary);">
+                <i class="fas fa-comments fa-2x" style="color: var(--secondary-color); margin-bottom: 10px;"></i>
+                <h5 style="margin: 0;">MaaSakhi AI</h5>
+            </a>
+            <a href="{{ url_for('main.pregnancy_guide') }}" class="glass-card stat-card"
+                style="text-decoration: none; padding: 25px; text-align: center; display: block; color: var(--text-primary);">
+                <i class="fas fa-book-medical fa-2x" style="color: var(--accent-color); margin-bottom: 10px;"></i>
+                <h5 style="margin: 0;">Pregnancy Guide</h5>
+            </a>
+            <a href="{{ url_for('main.emergency') }}" class="glass-card stat-card"
+                style="text-decoration: none; padding: 25px; text-align: center; display: block; color: var(--text-primary); border: 1px solid var(--danger-color);">
+                <i class="fas fa-ambulance fa-2x" style="color: var(--danger-color); margin-bottom: 10px;"></i>
+                <h5 style="margin: 0; color: var(--danger-color);">Emergency</h5>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .stat-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        /* Ensure full height for uniformity */
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Custom Range Slider Styling */
+    /* Custom Range Slider Styling */
+    input[type=range] {
+        -webkit-appearance: none;
+        width: 100%;
+        margin: 10px 0;
+        background: transparent;
+    }
+
+    input[type=range]:focus {
+        outline: none;
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 8px;
+        cursor: pointer;
+        background: #ffe3ec;
+        /* Light Pink Track */
+        border-radius: 5px;
+        border: 1px solid #ffb6c1;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 24px;
+        width: 24px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        cursor: pointer;
+        margin-top: -9px;
+        /* Centers thumb on the track */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: transform 0.1s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+    }
+
+    /* Firefox Support */
+    input[type=range]::-moz-range-track {
+        width: 100%;
+        height: 8px;
+        cursor: pointer;
+        background: #ffe3ec;
+        border-radius: 5px;
+        border: 1px solid #ffb6c1;
+    }
+
+    input[type=range]::-moz-range-thumb {
+        height: 24px;
+        width: 24px;
+        border: none;
+        border-radius: 50%;
+        background: var(--primary-color);
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+</style>
+{% endblock %}

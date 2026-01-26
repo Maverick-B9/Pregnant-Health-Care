@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Future Health</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Floating Background Elements -->
+    <div class="deco-blob blob-1"></div>
+    <div class="deco-blob blob-2"></div>
+
+    <div class="auth-wrapper"
+        style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div class="auth-container glass-card page-transition"
+            style="max-width: 450px; width: 100%; padding: 40px; text-align: center; border: 2px solid rgba(255, 255, 255, 0.8);">
+
+            <div style="margin-bottom: 30px;">
+                <img src="{{ url_for('static', filename='logo.png') }}" class="logo-pulse" alt="MaaSakhi Logo"
+                    style="width: 120px; height: auto;">
+            </div>
+
+            <h2 class="auth-title" style="color: var(--primary-color); font-size: 2rem; margin-bottom: 10px;">Namaste!
+                🙏</h2>
+            <p class="auth-subtitle" style="color: var(--text-secondary); margin-bottom: 30px;">Sign in to your sacred
+                space</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages-container" style="margin-bottom: 20px;">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" style="font-size: 0.9rem;">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST"
+                action="{{ url_for('auth.login') }}{% if request.args.next %}?next={{ request.args.next|urlencode }}{% endif %}"
+                class="auth-form">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <div style="position: relative;">
+                        <i class="fas fa-envelope"
+                            style="position: absolute; left: 15px; top: 15px; color: var(--primary-soft);"></i>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Your Email"
+                            value="{{ request.form.email or '' }}" required
+                            style="padding-left: 45px; background: rgba(255,255,255,0.9);">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <div style="position: relative;">
+                        <i class="fas fa-lock"
+                            style="position: absolute; left: 15px; top: 15px; color: var(--primary-soft);"></i>
+                        <input type="password" id="password" name="password" class="form-control"
+                            placeholder="Your Password" required
+                            style="padding-left: 45px; background: rgba(255,255,255,0.9);">
+                    </div>
+                </div>
+
+                <div class="form-group" style="text-align: left; margin-bottom: 30px; padding-left: 5px;">
+                    <label
+                        style="color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="remember" value="true"
+                            style="accent-color: var(--primary-color); width: 16px; height: 16px;">
+                        <span style="font-size: 0.95rem;">Remember Me</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary"
+                    style="width: 100%; padding: 15px; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(255, 105, 180, 0.3);">
+                    Begin Journey <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                </button>
+            </form>
+
+            <div style="margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                    New to MaaSakhi? <a href="{{ url_for('auth.register') }}"
+                        style="font-weight: 700; color: var(--accent-color);">Join the Family</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .logo-pulse {
+            animation: pulse 3s infinite ease-in-out;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.2);
+        }
+    </style>
+</body>
+
+</html>

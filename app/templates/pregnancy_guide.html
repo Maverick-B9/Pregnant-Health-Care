@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Pregnancy Guide - Future Health{% endblock %}
+
+{% block content %}
+<div class="container fade-up" style="max-width: 900px; margin: 0 auto; padding-top: 20px;">
+
+    <!-- Header Section -->
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 class="auth-title" style="margin-bottom: 10px;">Weekly Pregnancy Guide</h1>
+        <p style="color: var(--text-secondary); font-size: 1.1rem;">
+            Expert medical insights for every stage of your journey.
+        </p>
+    </div>
+
+    <!-- Week Selector Form -->
+    <div class="glass-card" style="padding: 30px; margin-bottom: 40px; text-align: center;">
+        <form method="POST" action="{{ url_for('main.pregnancy_guide') }}"
+            style="display: flex; flex-direction: column; align-items: center; gap: 25px; width: 100%;">
+
+            <div class="form-group" style="width: 100%; max-width: 400px; text-align: center;">
+                <label for="week-display"
+                    style="color: var(--text-primary); margin-bottom: 15px; display: block; font-size: 1.2rem;">
+                    Currently in <span style="color: var(--primary-accent); font-weight: bold; font-size: 1.4rem;">Week
+                        <span id="week-text">{{ selected_week }}</span></span>
+                </label>
+
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <!-- Number Input for precision -->
+                    <input type="number" id="week-input" name="week" value="{{ selected_week }}" min="1" max="42"
+                        class="form-control" style="width: 80px; text-align: center; font-size: 1.2rem; padding: 10px;">
+
+                    <!-- Range Slider for easy selection -->
+                    <input type="range" id="week-slider" min="1" max="42" value="{{ selected_week }}" class="slider"
+                        style="flex-grow: 1;">
+                </div>
+                <p style="margin-top: 10px; font-size: 0.9rem; color: var(--text-secondary);">
+                    Slide or type to select your pregnancy week (1-42)
+                </p>
+            </div>
+
+            <button type="submit" class="btn-primary fade-in"
+                style="min-width: 200px; height: 50px; font-size: 1.1rem;">
+                <i class="fas fa-wand-magic-sparkles" style="margin-right: 8px;"></i> Generate Guide
+            </button>
+        </form>
+
+        <script>
+            // Synchronize Slider and Input
+            const slider = document.getElementById('week-slider');
+            const input = document.getElementById('week-input');
+            const text = document.getElementById('week-text');
+
+            function updateVal(val) {
+                slider.value = val;
+                input.value = val;
+                text.innerText = val;
+            }
+
+            slider.addEventListener('input', (e) => updateVal(e.target.value));
+            input.addEventListener('input', (e) => updateVal(e.target.value));
+        </script>
+    </div>
+
+    <!-- Guide Content Area -->
+    {% if guide_content %}
+    <div class="fade-up">
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px;">
+
+            <!-- Baby Development -->
+            <div class="glass-card stat-card" style="border-top: 4px solid var(--primary-accent);">
+                <h3 style="color: var(--primary-accent); margin-bottom: 15px; display: flex; align-items: center;">
+                    <i class="fas fa-baby" style="margin-right: 10px;"></i> Baby Development
+                </h3>
+                <div style="color: var(--text-primary); line-height: 1.6;">
+                    {{ guide_content.baby_development|clean_bullets|markdown|safe }}
+                </div>
+            </div>
+
+            <!-- Mother's Body -->
+            <div class="glass-card stat-card" style="border-top: 4px solid var(--secondary-accent);">
+                <h3 style="color: var(--secondary-accent); margin-bottom: 15px; display: flex; align-items: center;">
+                    <i class="fas fa-person-pregnant" style="margin-right: 10px;"></i> Your Body
+                </h3>
+                <div style="color: var(--text-primary); line-height: 1.6;">
+                    {{ guide_content.mothers_body|clean_bullets|markdown|safe }}
+                </div>
+            </div>
+
+            <!-- Nutrition -->
+            <div class="glass-card stat-card" style="border-top: 4px solid var(--success-color);">
+                <h3 style="color: var(--success-color); margin-bottom: 15px; display: flex; align-items: center;">
+                    <i class="fas fa-apple-whole" style="margin-right: 10px;"></i> Nutrition
+                </h3>
+                <div style="color: var(--text-primary); line-height: 1.6;">
+                    {{ guide_content.nutrition_tips|clean_bullets|markdown|safe }}
+                </div>
+            </div>
+
+            <!-- To-Do List -->
+            <div class="glass-card stat-card" style="border-top: 4px solid #3498db;">
+                <h3 style="color: #3498db; margin-bottom: 15px; display: flex; align-items: center;">
+                    <i class="fas fa-clipboard-check" style="margin-right: 10px;"></i> Checklist
+                </h3>
+                <div style="color: var(--text-primary); line-height: 1.6;">
+                    {{ guide_content.todo_list|clean_bullets|markdown|safe }}
+                </div>
+            </div>
+
+            <!-- Warning Signs -->
+            <div class="glass-card stat-card"
+                style="grid-column: 1 / -1; border-left: 4px solid #e74c3c; background: rgba(231, 76, 60, 0.1);">
+                <h3 style="color: #e74c3c; margin-bottom: 15px; display: flex; align-items: center;">
+                    <i class="fas fa-triangle-exclamation" style="margin-right: 10px;"></i> Warning Signs
+                </h3>
+                <div style="color: var(--text-primary); line-height: 1.6;">
+                    {{ guide_content.warning_signs|clean_bullets|markdown|safe }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

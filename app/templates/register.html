@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Future Health</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-container glass-card fade-up">
+            <h2 class="auth-title">Join the Future</h2>
+            <p class="auth-subtitle">Create your personal health profile</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages-container">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form">
+                <div class="form-group">
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Full Name"
+                        value="{{ request.form.name or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Email Address"
+                        value="{{ request.form.email or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Choose Password" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Create Account</button>
+            </form>
+
+            <div style="margin-top: 30px; border-top: 1px solid var(--glass-border); padding-top: 20px;">
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                    Already have an account? <a href="{{ url_for('auth.login') }}">Log In</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
