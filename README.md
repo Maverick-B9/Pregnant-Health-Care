@@ -1,4 +1,4 @@
-# MaaSakhi - Smart Maternal Health App 🌸
+# MaaSakhi - Smart Maternal Health App
 
 **Developed By Balaram B**
 
