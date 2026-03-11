@@ -1,9 +1,38 @@
 # smart-healthcare-app/app/__init__.py
 from flask import Flask, current_app
-from flask_mysqldb import MySQL
 from flask_cors import CORS
 from flask_login import LoginManager
 import os
+import pymysql
+
+class MySQL:
+    def __init__(self, app=None):
+        self.app = app
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        self.app = app
+        app.teardown_appcontext(self.teardown)
+
+    @property
+    def connection(self):
+        from flask import g
+        if 'mysql_db' not in g:
+            g.mysql_db = pymysql.connect(
+                host=self.app.config.get('MYSQL_HOST', 'localhost'),
+                user=self.app.config.get('MYSQL_USER'),
+                password=self.app.config.get('MYSQL_PASSWORD'),
+                db=self.app.config.get('MYSQL_DB', 'smart_health_db'),
+                autocommit=True
+            )
+        return g.mysql_db
+
+    def teardown(self, exception):
+        from flask import g
+        db = g.pop('mysql_db', None)
+        if db is not None:
+            db.close()
 try:
     import tensorflow as tf
 except ImportError:
