@@ -4,7 +4,10 @@ from flask_mysqldb import MySQL
 from flask_cors import CORS
 from flask_login import LoginManager
 import os
-import tensorflow as tf
+try:
+    import tensorflow as tf
+except ImportError:
+    tf = None
 import logging
 import datetime
 
@@ -16,6 +19,9 @@ login_manager.login_message_category = 'info' # For styling flashed messages
 logger = logging.getLogger('app') # Main app logger
 
 def load_tf_model(model_path_from_config):
+    if tf is None:
+        logger.warning("TensorFlow not installed. Diagnostics model will not be loaded.")
+        return None
     if model_path_from_config and os.path.exists(model_path_from_config):
         try:
             # Suppress TensorFlow INFO/WARNING logs if they are too verbose during model loading

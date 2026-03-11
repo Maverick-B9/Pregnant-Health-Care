@@ -3,7 +3,7 @@ Flask-MySQLdb==1.0.1
 Flask-Cors==4.0.0
 Flask-Login==0.6.2
 google-genai==0.3.0
-tensorflow-cpu==2.13.0
+# tensorflow-cpu==2.13.0  (Commented out to stay within Vercel size limit)
 python-dotenv==1.0.0
 numpy==1.24.3
 markdown==3.4.4
